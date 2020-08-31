@@ -20,7 +20,16 @@ define('APP_PATH', FC_PATH . 'App' . DS);
  */
 define('VIEW_PATH', APP_PATH . 'Views' . DS);
 
-error_reporting(E_ALL | E_ERROR);
+error_reporting(E_ALL);
 
-var_dump(get_defined_constants(true)['user']);
+require_once CORE_PATH . 'CommonFunctions.php';
+
+set_error_handler('error_handler');
+set_exception_handler('exception_handler');
+
+$config['base_path'] = FC_PATH;
+$config['debug'] = false;
+
+$config['site_name'] = 'MyCMS';
+$config['admin_email'] = 'admin@domain.com';
 
