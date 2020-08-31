@@ -60,12 +60,14 @@ if (!function_exists('exception_handler')) {
         $body .=        '<div style="display: flex; align-items: stretch;">';
         $body .=            '<div style="flex-grow: 1; padding-right: 10px; line-height: 30px; width: 15%; background-color: lightgray;  font-weight: bold; text-align: right;">';
         $body .=                '<div>Type:</div>';
+        $body .=                '<div>Severity:</div>';
         $body .=                '<div>Message:</div>';
         $body .=                '<div>File:</div>';
         $body .=                '<div>Line:</div>';
         $body .=            '</div>';
         $body .=            '<div style="flex-grow: 9; line-height: 30px; margin-left: 10px; width: 85%;">';
         $body .=                '<div>' . get_class($e) . '</div>';
+        $body .=                '<div>' . friendly_error_type($e->getSeverity()) . '</div>';
         $body .=                '<div>' . $e->getMessage() . '</div>';
         $body .=                '<div>' . $e->getFile() . '</div>';
         $body .=                '<div>' . $e->getLine() . '</div>';
@@ -100,10 +102,45 @@ if (!function_exists('exception_handler')) {
     }
 }
 
+if (!function_exists('friendly_error_type')) {
+    /**
+     * Gets the name of error constants.
+     *
+     * @param int $type Error type.
+     *
+     * @return string The error name.
+     */
+    function friendly_error_type($type) {
+        static $levels = null;
+        if (!$levels) {
+            $levels = [];
+            foreach (get_defined_constants(true)['Core'] as $key => $value) {
+                if (strpos($key, 'E_') !== 0) {
+                    continue;
+                }
+                $levels[$value] = substr($key, 2);
+            }
+        }
+
+        $result = [];
+        foreach ($levels as $int => $string) {
+            if ($int & $type) {
+                $result[] = $string;
+            }
+            $type &= ~$int;
+        }
+        if ($type) {
+            $result[] = "Error Remainder [{$type}]";
+        }
+
+        return implode(' & ', $result);
+    }
+}
+
 if (!function_exists('shutdown_function')) {
     function shutdown_function() {
         $error = error_get_last();
-        if ($error && $error['type'] === E_ERROR) {
+        if (/** $error && */$error['type'] === E_ERROR) {
             error_handler($error['type'], $error['message'], $error['file'], $error['line']);
         }
     }

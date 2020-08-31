@@ -29,8 +29,7 @@ ini_set('display_errors', 'off');
 error_reporting(E_ALL);
 
 $config['base_path'] = FC_PATH;
-$config['debug'] = false;
+$config['debug'] = true;
 
 $config['site_name'] = 'MyCMS';
 $config['admin_email'] = 'admin@domain.com';
-
