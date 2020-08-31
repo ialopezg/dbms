@@ -9,3 +9,6 @@
 ### Other files
 # Mac OSX project files
 .DS_Store
+
+# Log files
+tmp
