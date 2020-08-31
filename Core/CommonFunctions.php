@@ -1,4 +1,47 @@
 <?php
+if (!function_exists('')) {
+    /**
+     * Increases or decreases the brightness of a color by a percentage of the current brightness.
+     *
+     * @param string $hex_code Supported formats: `#FFF`, `#FFFFFF`, `FFF`, `FFFFFF`
+     * @param float $adjustment A number between -1 and 1. E.g. 0.3 = 30% lighter; -0.4 = 40% darker.
+     *
+     * @return string A color string.
+     */
+    function adjust_color_bright($hex_code, $adjustment) {
+        $hex_code = ltrim($hex_code, '#');
+
+        if (strlen($hex_code) == 3) {
+            $hex_code = $hex_code[0] . $hex_code[0] . $hex_code[1] . $hex_code[1] . $hex_code[2] . $hex_code[2];
+        }
+
+        $hexCode = array_map('hexdec', str_split($hex_code, 2));
+
+        foreach ($hexCode as & $color) {
+            $adjustableLimit = $adjustment < 0 ? $color : 255 - $color;
+            $adjustAmount = ceil($adjustableLimit * $adjustment);
+
+            $color = str_pad(dechex($color + $adjustAmount), 2, '0', STR_PAD_LEFT);
+        }
+
+        return '#' . implode($hexCode);
+    }
+}
+
+if (!function_exists('error_handler')) {
+    /**
+     * Custom error handler.
+     *
+     * @param string $error_severity Error severity.
+     * @param string $error_message Error message.
+     * @param string $error_file Error file where error occurs.
+     * @param string $error_line Error file line
+     * @param null $error_context
+     */
+	function error_handler($error_severity, $error_message, $error_file, $error_line, $error_context = null) {
+	    exception_handler(new ErrorException($error_message, 0, $error_severity, $error_file, $error_line));
+	}
+}
 
 if (!function_exists('exception_handler')) {
     /**
@@ -30,7 +73,7 @@ if (!function_exists('exception_handler')) {
         $body .=        '</div>';
         $body .=    '</div>';
         if (isset($config['debug']) && $config['debug']) {
-           print $body;
+            print $body;
         } else {
             $message = '[' . date('Y-m-d H:m:i') . '] - Type: ' . get_class($e) . "; Message: {$e->getMessage()}; File: {$e->getFile()}; Line: {$e->getLine()}";
             $file = 'exceptions.log';
@@ -57,47 +100,11 @@ if (!function_exists('exception_handler')) {
     }
 }
 
-if (!function_exists('error_handler')) {
-    /**
-     * Custom error handler.
-     *
-     * @param string $error_severity Error severity.
-     * @param string $error_message Error message.
-     * @param string $error_file Error file where error occurs.
-     * @param string $error_line Error file line
-     * @param null $error_context
-     */
-	function error_handler($error_severity, $error_message, $error_file, $error_line, $error_context = null) {
-	    exception_handler(new ErrorException($error_message, 0, $error_severity, $error_file, $error_line));
-	}
-}
-
-if (!function_exists('')) {
-    /**
-     * Increases or decreases the brightness of a color by a percentage of the current brightness.
-     *
-     * @param string $hex_code Supported formats: `#FFF`, `#FFFFFF`, `FFF`, `FFFFFF`
-     * @param float $adjustment A number between -1 and 1. E.g. 0.3 = 30% lighter; -0.4 = 40% darker.
-     *
-     * @return string A color string.
-     */
-    function adjust_color_bright($hex_code, $adjustment) {
-        $hex_code = ltrim($hex_code, '#');
-
-        if (strlen($hex_code) == 3) {
-            $hex_code = $hex_code[0] . $hex_code[0] . $hex_code[1] . $hex_code[1] . $hex_code[2] . $hex_code[2];
+if (!function_exists('shutdown_function')) {
+    function shutdown_function() {
+        $error = error_get_last();
+        if ($error && $error['type'] === E_ERROR) {
+            error_handler($error['type'], $error['message'], $error['file'], $error['line']);
         }
-
-        $hexCode = array_map('hexdec', str_split($hex_code, 2));
-
-        foreach ($hexCode as & $color) {
-            $adjustableLimit = $adjustment < 0 ? $color : 255 - $color;
-            $adjustAmount = ceil($adjustableLimit * $adjustment);
-
-            $color = str_pad(dechex($color + $adjustAmount), 2, '0', STR_PAD_LEFT);
-        }
-
-        return '#' . implode($hexCode);
     }
 }
-

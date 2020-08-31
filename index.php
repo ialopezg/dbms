@@ -20,12 +20,13 @@ define('APP_PATH', FC_PATH . 'App' . DS);
  */
 define('VIEW_PATH', APP_PATH . 'Views' . DS);
 
-error_reporting(E_ALL);
-
 require_once CORE_PATH . 'CommonFunctions.php';
 
+register_shutdown_function('shutdown_function');
 set_error_handler('error_handler');
 set_exception_handler('exception_handler');
+ini_set('display_errors', 'off');
+error_reporting(E_ALL);
 
 $config['base_path'] = FC_PATH;
 $config['debug'] = false;
