@@ -1,0 +1,11 @@
+########################
+# DBM: Database Manager
+########################
+
+### Jetbrains Software
+# IntelliJ IDEA
+.idea
+
+### Other files
+# Mac OSX project files
+.DS_Store
