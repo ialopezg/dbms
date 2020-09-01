@@ -15,16 +15,16 @@ if (!function_exists('')) {
             $hex_code = $hex_code[0] . $hex_code[0] . $hex_code[1] . $hex_code[1] . $hex_code[2] . $hex_code[2];
         }
 
-        $hexCode = array_map('hexdec', str_split($hex_code, 2));
+        $hex_code = array_map('hexdec', str_split($hex_code, 2));
 
-        foreach ($hexCode as & $color) {
+        foreach ($hex_code as & $color) {
             $adjustableLimit = $adjustment < 0 ? $color : 255 - $color;
             $adjustAmount = ceil($adjustableLimit * $adjustment);
 
             $color = str_pad(dechex($color + $adjustAmount), 2, '0', STR_PAD_LEFT);
         }
 
-        return '#' . implode($hexCode);
+        return '#' . implode($hex_code);
     }
 }
 
@@ -38,7 +38,7 @@ if (!function_exists('error_handler')) {
      * @param string $error_line Error file line
      * @param null $error_context
      */
-	function error_handler($error_severity, $error_message, $error_file, $error_line, $error_context = null) {
+	function error_handler($error_severity, $error_message, $error_file, $error_line) {
 	    exception_handler(new ErrorException($error_message, 0, $error_severity, $error_file, $error_line));
 	}
 }
@@ -64,6 +64,7 @@ if (!function_exists('exception_handler')) {
         $body .=                '<div>Message:</div>';
         $body .=                '<div>File:</div>';
         $body .=                '<div>Line:</div>';
+        $body .=                '<div>Trace:</div>';
         $body .=            '</div>';
         $body .=            '<div style="flex-grow: 9; line-height: 30px; margin-left: 10px; width: 85%;">';
         $body .=                '<div>' . get_class($e) . '</div>';
@@ -71,6 +72,7 @@ if (!function_exists('exception_handler')) {
         $body .=                '<div>' . $e->getMessage() . '</div>';
         $body .=                '<div>' . $e->getFile() . '</div>';
         $body .=                '<div>' . $e->getLine() . '</div>';
+        $body .=                '<div>' . $e->getTraceAsString() . '</div>';
         $body .=            '</div>';
         $body .=        '</div>';
         $body .=    '</div>';
@@ -122,25 +124,14 @@ if (!function_exists('friendly_error_type')) {
             }
         }
 
-        $result = [];
-        foreach ($levels as $int => $string) {
-            if ($int & $type) {
-                $result[] = $string;
-            }
-            $type &= ~$int;
-        }
-        if ($type) {
-            $result[] = "Error Remainder [{$type}]";
-        }
-
-        return implode(' & ', $result);
+        return (isset($levels[$type]) ? $levels[$type] : "Error #{$type}");
     }
 }
 
 if (!function_exists('shutdown_function')) {
     function shutdown_function() {
         $error = error_get_last();
-        if (/** $error && */$error['type'] === E_ERROR) {
+        if ($error && $error['type'] === E_ERROR) {
             error_handler($error['type'], $error['message'], $error['file'], $error['line']);
         }
     }
