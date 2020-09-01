@@ -44,3 +44,22 @@ $config['site_name'] = 'DBMS';
  * Site webmaster email.
  */
 $config['admin_email'] = 'admin@domain.com';
+
+/*
+ *--------------------------------------------------------------------------
+ * Auth Settings
+ *--------------------------------------------------------------------------
+ */
+
+/**
+ * DBMS username.
+ */
+define('DBMS_USERNAME', 'dbms');
+/**
+ * DBMS password.
+ */
+define('DBMS_PASSWORD', 'dbms');
+/**
+ * Enable or disable DBMS Authentication Module.
+ */
+define('DBMS_AUTH', strlen(DBMS_USERNAME) && strlen(DBMS_PASSWORD));
