@@ -1,4 +1,8 @@
 <IfModule mod_rewrite.c>
 	RewriteEngine on
+
+    # Uncomment or comment this line activate the production environment
+	# SetEnv DBMS_ENV production
+
 	RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
 </IfModule>

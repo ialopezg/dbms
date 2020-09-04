@@ -1,26 +1,27 @@
 <?php
-/*
- *--------------------------------------------------------------------------
- * File System Settings
- *--------------------------------------------------------------------------
+/**
+ * @package Core
  */
 
 /**
- * Alias for DIRECTORY_SEPARATOR
+ * Application environment.
  */
-define('DS', DIRECTORY_SEPARATOR);
-/**
- * Front-Controller path. Appoint to this file path container.
- */
-define('DBMS_ROOT_PATH', dirname(__FILE__) . DS);
-/**
- * Core path. Libraries and other tools will be located in this path.
- */
-define('DBMS_CORE_PATH', DBMS_ROOT_PATH . 'Core' . DS);
-/**
- * Application path.
- */
-define('DBMS_APP_PATH', DBMS_ROOT_PATH . 'App' . DS);
+define('ENVIRONMENT', getenv('DBMS_ENV') ? getenv('DBMS_ENV') : 'development');
+switch (ENVIRONMENT) {
+    case 'development':
+        error_reporting(-1);
+        ini_set('display_errors', 'on');
+        break;
+    case 'testing':
+    case 'production':
+        ini_set('display_errors', 'off');
+        error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
+        break;
+    default:
+        header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
+        echo 'The application environment is not set correctly.';
+        exit(1);
+}
 
 /*
  *--------------------------------------------------------------------------
@@ -31,11 +32,11 @@ define('DBMS_APP_PATH', DBMS_ROOT_PATH . 'App' . DS);
 /**
  * Application base path.
  */
-$config['base_path'] = DBMS_ROOT_PATH;
+$config['base_path'] = '';
 /**
  * Debug mode.
  */
-$config['debug'] = true;
+$config['debug'] = ENVIRONMENT === 'development';
 /**
  * Site name.
  */

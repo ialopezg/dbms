@@ -1,16 +1,45 @@
 <?php
-require_once 'config.php';
+/*
+ *--------------------------------------------------------------------------
+ * File System Settings
+ *--------------------------------------------------------------------------
+ */
 
-require_once DBMS_CORE_PATH . 'CommonFunctions.php';
+/**
+ * Alias for DIRECTORY_SEPARATOR
+ */
+define('DS', DIRECTORY_SEPARATOR);
+/**
+ * Front-Controller path. Appoint to this file path container.
+ */
+define('ROOT_PATH', dirname(__FILE__) . DS);
+/**
+ * Core path. Libraries and other tools will be located in this path.
+ */
+define('CORE_PATH', ROOT_PATH . 'Core' . DS);
+/**
+ * Application path.
+ */
+define('APP_PATH', ROOT_PATH . 'App' . DS);
+/**
+ * Application logs path.
+ */
+define('LOGS_PATH', APP_PATH . 'Logs' . DS);
+
+/**
+ * Load default configurations.
+ */
+require_once ROOT_PATH . 'config.php';
+
+require_once CORE_PATH . 'CommonFunctions.php';
 
 register_shutdown_function('shutdown_function');
 set_error_handler('error_handler');
 set_exception_handler('exception_handler');
-ini_set('display_errors', 'off');
-error_reporting(E_ALL ^ E_NOTICE);
 
 // Loader object
-require_once DBMS_CORE_PATH . 'Loader.php';
+require_once CORE_PATH . 'Loader.php';
 
 Loader::instance()
-    ->authenticate();
+    ->authenticate()
+    ->dispatch();
