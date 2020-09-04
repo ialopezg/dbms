@@ -128,6 +128,27 @@ if (!function_exists('friendly_error_type')) {
     }
 }
 
+if (!function_exists('log_message')) {
+    /**
+     * Log a message into the default log system.
+     *
+     * @param int $level Log message level. Accepts: DEBUG, ERROR, INFO and WARNING messages.
+     * @param string $message Message to be logged.
+     */
+    function log_message($level, $message) {
+        static $logger;
+
+        if (!class_exists('Log')) {
+            require_once CORE_PATH . 'Log.php';
+        }
+
+        if (!($logger instanceof Log)) {
+            $logger = new Log();
+        }
+        $logger->write($level, $message);
+    }
+}
+
 if (!function_exists('shutdown_function')) {
     function shutdown_function() {
         $error = error_get_last();
