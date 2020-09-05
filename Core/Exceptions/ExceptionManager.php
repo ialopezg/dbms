@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ExceptionManager class
+ * ExceptionsManager class
  */
 class ExceptionManager {
     protected $ob_level;
@@ -41,7 +41,7 @@ class ExceptionManager {
      * @param int $line Line were occurs the exception.
      */
     public function log_exception($severity, $message, $file, $line) {
-        $severity = $this->get_levels()[$severity] ? $this->get_levels()[$severity] : $severity;
+        $severity = isset($this->get_levels()[$severity]) ? $this->get_levels()[$severity] : ucwords(strtolower($severity));
         log_message('error', "Severity: {$severity} - {$message} in ${file} on line ${line}");
     }
 
@@ -78,6 +78,33 @@ class ExceptionManager {
     }
 
     /**
+     * @param Exception $e
+     */
+    public function show_exception($e) {
+        $template_path = config_item('error_views_path');
+        if (empty($template_path)) {
+            $template_path = VIEWS_PATH . 'errors' . DS;
+        } else {
+            $template_path = rtrim(config_item('error_templates_path'), '/\\') . DS;
+        }
+
+        $message = empty($e->getMessage()) ? $e->getMessage() : '(null)';
+
+        $template = 'exception_error';
+
+        if (ob_get_level() > $this->ob_level) {
+            ob_end_flush();
+        }
+
+        ob_start();
+        include("{$template_path}{$template}.php");
+        $buffer = ob_get_contents();
+        ob_end_clean();
+
+        echo $buffer;
+    }
+
+    /**
      * Shows a PHP error message.
      *
      * @param int $severity Error level.
@@ -93,7 +120,7 @@ class ExceptionManager {
             $template_path = rtrim(config_item('error_templates_path'), '/\\') . DS;
         }
 
-        $severity = $this->get_levels()[$severity] ? $this->get_levels()[$severity] : $severity;
+        $severity = isset($this->get_levels()[$severity]) ? $this->get_levels()[$severity] : ucwords(strtolower($severity));
 
         $file = str_replace('\\', '/', $file);
         if (false !== strpos($file, '/')) {
