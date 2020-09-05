@@ -45,5 +45,5 @@ register_shutdown_function('shutdown_function');
 require_once CORE_PATH . 'Loader.php';
 
 Loader::instance()
-    ->authenticate();
-//    ->dispatch();
+    ->authenticate()
+    ->dispatch();

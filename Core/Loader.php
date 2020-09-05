@@ -1,6 +1,11 @@
 <?php
 class Loader {
     /**
+     * @var string Action to be executed.
+     */
+    protected $action = 'index';
+
+    /**
      * Authorization function.
      */
     public function authenticate() {
@@ -29,6 +34,34 @@ class Loader {
         }
 
         return $this;
+    }
+
+    /**
+     * Dispatcher
+     */
+    public function dispatch() {
+        $action = $this->getAction() . 'Action';
+        $this->$action();
+    }
+
+    /**
+     * Get current action.
+     *
+     * @return string Action requested.
+     */
+    protected function getAction() {
+        if (isset($_GET['a'])) {
+            $action = $_GET['a'];
+            if (in_array("{$action}Action", get_class_methods(get_class($this)))) {
+                $this->action = $action;
+            }
+        }
+
+        return $this->action;
+    }
+
+    public function indexAction() {
+        echo 'Index page';
     }
 
     /**
