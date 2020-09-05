@@ -8,3 +8,8 @@ PHP Web-based Database Manager System
 1. Error Handling Module (notifications, warnings, app and core error, and system fatalities).
 2. Authentication Module (Basic Authentication).
 3. Log Service Module
+4. Database Module
+
+## Requirements
+
+* PHP v.7.1+
