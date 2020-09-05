@@ -8,8 +8,6 @@ class ExceptionManager {
 
     public function __construct() {
         $this->ob_level = ob_get_level();
-
-        return $this;
     }
 
     /**

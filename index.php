@@ -25,12 +25,14 @@ define('APP_PATH', ROOT_PATH . 'App' . DS);
  * Application logs path.
  */
 define('LOGS_PATH', APP_PATH . 'Logs' . DS);
-
 /**
- * Load default configurations.
+ * Views templates path.
  */
-require_once ROOT_PATH . 'config.php';
+define('VIEWS_PATH', APP_PATH . 'Views' . DS);
 
+// Load default configurations
+require_once ROOT_PATH . 'config.php';
+// Load common functions
 require_once CORE_PATH . 'CommonFunctions.php';
 
 register_shutdown_function('shutdown_function');
