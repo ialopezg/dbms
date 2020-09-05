@@ -11,6 +11,54 @@ class ExceptionManager {
     }
 
     /**
+     * Returns a name of an error constant.
+     *
+     * @param int|string $type Error type (supports: E_ALL, 1)
+     *
+     * @return string The error name
+     */
+    public function get_level($type) {
+        $levels = $this->get_levels();
+
+        return (isset($levels[$type]) ? $levels[$type] : "Error #{$type}");
+    }
+
+    /**
+     * Returns an associative array with the names of all error constants.
+     *
+     * @return array The error name.
+     */
+    public function get_levels() {
+        static $levels = null;
+
+        if (!$levels) {
+            $levels = [];
+            foreach (get_defined_constants(true)['Core'] as $key => $value) {
+                if (strpos($key, 'E_') !== 0) {
+                    continue;
+                }
+
+                $levels[$value] = ucwords(substr(str_replace('_', ' ', strtolower($key)), 2));
+            }
+        }
+
+        return $levels;
+    }
+
+    /**
+     * Log an exception.
+     *
+     * @param int $level Log message level.
+     * @param string $message Message to be logged.
+     * @param string $file File were occurs the exception.
+     * @param string $line Line were occurs the exception.
+     */
+    public function log_exception($level, $message, $file, $line) {
+        $level = $this->get_level($level);
+        log_message('error', "Severity: {$level} - {$message} in ${file} on line ${line}");
+    }
+
+    /**
      * Shows an error message in html form.
      *
      * @param string $heading Error heading message.
