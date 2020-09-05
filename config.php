@@ -23,20 +23,6 @@ switch (ENVIRONMENT) {
         exit(1);
 }
 
-/*
- *--------------------------------------------------------------------------
- * Application Settings
- *--------------------------------------------------------------------------
- */
-
-/**
- * Application base path.
- */
-$config['base_path'] = '';
-/**
- * Debug mode.
- */
-$config['debug'] = ENVIRONMENT === 'development';
 /**
  * Site name.
  */
