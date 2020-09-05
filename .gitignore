@@ -11,4 +11,4 @@
 .DS_Store
 
 # Log files
-tmp
+App/Logs/*.log
