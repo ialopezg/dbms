@@ -154,6 +154,7 @@ if (!function_exists('set_status_header')) {
 
         if (empty($message)) {
             $http_status_codes = [
+                500	=> 'Internal Server Error',
                 503	=> 'Service Unavailable',
             ];
 
