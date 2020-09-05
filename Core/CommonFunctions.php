@@ -148,8 +148,7 @@ if (!function_exists('set_status_header')) {
         $status_code = abs($status_code);
 
         if (empty($status_code) || !is_numeric($status_code)) {
-            // TODO: Implement friendly error message
-            die('HTTP status code must be a numeric value.');
+            show_error('HTTP status code must be a numeric value.');
         }
 
         if (empty($message)) {
@@ -161,8 +160,7 @@ if (!function_exists('set_status_header')) {
             if (isset($http_status_codes[$status_code])) {
                 $message = $http_status_codes[$status_code];
             } else {
-                // TODO: Implement friendly error message
-                die('No such text message available. Please, supply a message text for your status code.');
+                show_error('No such text message available. Please, supply a message text for your status code.');
             }
         }
 
@@ -176,6 +174,22 @@ if (!function_exists('set_status_header')) {
             'HTTP/1.0', 'HTTP/1.1', 'HTTP/2', 'HTTP/2.0'
             ], true) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
         header("{$server_protocol} {$status_code} {$message}", true, $status_code);
+    }
+}
+
+if (!function_exists('show_error')) {
+    function show_error($message, $status_code = 500, $heading = 'An error encountered') {
+        $status_code = abs($status_code);
+        if ($status_code < 100) {
+            $exit_code = $status_code + 9; // EXIT_AUTO_MIN
+            $status_code = 500;
+        } else {
+            $exit_code = 1; // EXIT_ERROR
+        }
+
+        require_once CORE_PATH . 'Exceptions/ExceptionManager.php';
+        echo (new ExceptionManager())->show_error($heading, $message, 'general', $status_code);
+        exit($exit_code);
     }
 }
 
