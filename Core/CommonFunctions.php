@@ -55,11 +55,51 @@ if (!function_exists('error_handler')) {
      * @param string $error_message Error message.
      * @param string $error_file Error file where error occurs.
      * @param string $error_line Error file line
-     * @param null $error_context
      */
 	function error_handler($error_severity, $error_message, $error_file, $error_line) {
-	    exception_handler(new ErrorException($error_message, 0, $error_severity, $error_file, $error_line));
+	    $is_error = ((E_ERROR | E_PARSE | E_COMPILE_ERROR | E_CORE_ERROR | E_USER_ERROR) & $error_severity) === $error_severity;
+	    if ($is_error) {
+	        set_status_header(500);
+        }
+
+	    // Ignore error when disabled error_reporting
+        if (($error_severity & error_reporting()) !== $error_severity) {
+            return;
+        }
+
+        require_once CORE_PATH . 'Exceptions/ExceptionManager.php';
+        $error_handler = new ExceptionManager();
+        $error_handler->log_exception($error_severity, $error_message, $error_file, $error_line);
+
+        if (str_ireplace(array('off', 'none', 'no', 'false', 'null'), '', ini_get('display_errors'))) {
+            $error_handler->show_php_error($error_severity, $error_message, $error_file, $error_line);
+        }
+
+        // If the error is fatal, the execution of the script should be stopped
+        if ($is_error) {
+            exit(1); // EXIT_ERROR
+        }
 	}
+}
+
+if (!function_exists('exception_handler')) {
+    /**
+     * Custom exception handler.
+     *
+     * @param Exception $e Exception to be analyzed.
+     */
+    function exception_handler($e) {
+        require_once CORE_PATH . 'Exceptions/ExceptionManager.php';
+        $error_handler = new ExceptionManager();
+        $error_handler->log_exception('error', "Exception: {$e->getMessage()}", $e->getFile(), $e->getLine());
+
+        set_status_header();
+        if (str_ireplace(array('off', 'none', 'no', 'false', 'null'), '', ini_get('display_errors'))) {
+            $error_handler->show_exception($e);
+        }
+
+        exit(1); // EXIT_ERROR
+    }
 }
 
 if (!function_exists('friendly_error_type')) {
@@ -144,6 +184,12 @@ if (!function_exists('log_message')) {
 }
 
 if (!function_exists('set_status_header')) {
+    /**
+     * Set the HTTP status code.
+     *
+     * @param int $status_code Status code to be set.
+     * @param string $message Status message.
+     */
     function set_status_header($status_code = 500, $message = '') {
         $status_code = abs($status_code);
 
@@ -178,6 +224,13 @@ if (!function_exists('set_status_header')) {
 }
 
 if (!function_exists('show_error')) {
+    /**
+     * Shows an error.
+     *
+     * @param string $message Error message.
+     * @param int $status_code Error status code.
+     * @param string $heading Error heading.
+     */
     function show_error($message, $status_code = 500, $heading = 'An error encountered') {
         $status_code = abs($status_code);
         if ($status_code < 100) {
@@ -194,9 +247,12 @@ if (!function_exists('show_error')) {
 }
 
 if (!function_exists('shutdown_function')) {
+    /**
+     * Detects fatal errors and manage them.
+     */
     function shutdown_function() {
         $error = error_get_last();
-        if ($error && $error['type'] === E_ERROR) {
+        if ($error && ($error['type'] & (E_ERROR | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_COMPILE_WARNING))) {
             error_handler($error['type'], $error['message'], $error['file'], $error['line']);
         }
     }
