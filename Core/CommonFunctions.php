@@ -241,7 +241,7 @@ if (!function_exists('show_error')) {
         }
 
         require_once CORE_PATH . 'Exceptions/ExceptionManager.php';
-        echo (new ExceptionManager())->show_error($heading, $message, 'general', $status_code);
+        echo (new ExceptionManager())->show_error($heading, $message, 'general_error', $status_code);
         exit($exit_code);
     }
 }
