@@ -109,6 +109,7 @@ if (!function_exists('get_config')) {
         }
 
         if (!isset($config) || !is_array($config)) {
+            set_status_header(503);
             echo 'The main config file does not appear to be formatted correctly.';
             exit(3); // EXIT_CONFIG
         }
@@ -139,6 +140,41 @@ if (!function_exists('log_message')) {
             $logger = new Log();
         }
         $logger->write($level, $message);
+    }
+}
+
+if (!function_exists('set_status_header')) {
+    function set_status_header($status_code = 500, $message = '') {
+        $status_code = abs($status_code);
+
+        if (empty($status_code) || !is_numeric($status_code)) {
+            // TODO: Implement friendly error message
+            die('HTTP status code must be a numeric value.');
+        }
+
+        if (empty($message)) {
+            $http_status_codes = [
+                503	=> 'Service Unavailable',
+            ];
+
+            if (isset($http_status_codes[$status_code])) {
+                $message = $http_status_codes[$status_code];
+            } else {
+                // TODO: Implement friendly error message
+                die('No such text message available. Please, supply a message text for your status code.');
+            }
+        }
+
+        if (strpos(PHP_SAPI, 'cgi') === 0) {
+            header("Status: {$status_code} {$message}", true);
+
+            return;
+        }
+
+        $server_protocol = isset($_SERVER['SERVER_PROTOCOL']) && in_array($_SERVER['SERVER_PROTOCOL'], [
+            'HTTP/1.0', 'HTTP/1.1', 'HTTP/2', 'HTTP/2.0'
+            ], true) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+        header("{$server_protocol} {$status_code} {$message}", true, $status_code);
     }
 }
 
