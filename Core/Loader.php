@@ -27,6 +27,8 @@ class Loader {
 
             exit();
         }
+
+        return $this;
     }
 
     /**
