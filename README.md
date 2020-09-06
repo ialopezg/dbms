@@ -9,6 +9,7 @@ PHP Web-based Database Manager System
 2. Authentication Module (Basic Authentication).
 3. Log Service Module
 4. Database Module
+    * Connection Manager
 
 ## Requirements
 
