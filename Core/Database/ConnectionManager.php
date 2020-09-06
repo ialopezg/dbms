@@ -1,4 +1,6 @@
 <?php
+defined('DS') || define('DS', DIRECTORY_SEPARATOR);
+
 class ConnectionManager {
     /**
      * @var array Connection list.
@@ -27,6 +29,36 @@ class ConnectionManager {
         }
 
         self::$initialized = true;
+    }
+
+    /**
+     * Returns a list containing database drivers supported.
+     *
+     * @return array Driver list if exists.
+     * @throws DBException
+     */
+    public static function getDrivers() {
+        $path = dirname(__FILE__) . DS . 'Drivers';
+        if (!is_dir($path)) {
+            if (function_exists('show_error')) {
+                show_error('No database drivers were found.');
+            } else {
+                throw new DBException('No database drivers were found.');
+            }
+        }
+
+        foreach (new DirectoryIterator($path) as $file) {
+            $result = [];
+
+            $pi = pathinfo($file);
+            if ($file->isDot() || $file->getExtension() !== 'php') {
+                continue;
+            }
+
+            $result[] = substr($file->getFilename(), 0, strlen($file->getFilename()) - (strlen($file->getExtension()) + 1));
+        }
+
+        return $result;
     }
 
     public static function hasConnections() {
