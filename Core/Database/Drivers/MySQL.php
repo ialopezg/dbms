@@ -26,21 +26,21 @@ class DBMySQL implements IDatabase {
 	 * @throws DBException
 	 */
 	public function connect($driver = 'mysql', $hostname = '', $username = '', $password = '', $database = '') {
-	    if (func_num_args() === 1 && is_array(func_get_arg(0))) {
-	        list('driver' => $driver,
-                'hostname' => $hostname,
-                'username' => $username,
-                'password' => $password,
-                'database' => $database,
-                'charset' => $charset) = func_get_arg(0);
-	        $driver = strtolower($driver);
+	    if (func_get_arg(0) && (is_object(func_get_arg(0)) || is_array(func_get_arg(0)))) {
+	        $db = func_get_arg(0);
+            $driver = strtolower((is_array($db) && isset($db['driver'])) ? $db['driver'] : ((is_object($db) && isset($db->driver)) ? $db->driver : $driver));
+	        $hostname = (is_array($db) && isset($db['hostname'])) ? $db['hostname'] : ((is_object($db) && isset($db->hostname)) ? $db->hostname : $hostname);
+            $username = (is_array($db) && isset($db['username'])) ? $db['username'] : ((is_object($db) && isset($db->username)) ? $db->username : $username);
+            $password = (is_array($db) && isset($db['password']))? $db['password'] : ((is_object($db) && isset($db->password)) ? $db->password : $password);
+            $database = (is_array($db) && isset($db['database'])) ? $db['database'] : ((is_object($db) && isset($db->database)) ? $db->database : $database);
+            $charset = (is_array($db) && isset($db['charset'])) ? $db['charset'] : ((is_object($db) && isset($db->charset)) ? $db->charset : 'utf8');
         }
 
 		try {
 			$this->connection = new PDO("{$driver}:host={$hostname};dbname={$database}", $username, $password, [
 				PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES {$charset}"
 			]);
-            $this->database = $database;
+            $this->database = $db;
 			$this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		} catch (PDOException $e) {
 			throw new DBException($e->getMessage(), (int)$e->getCode());
